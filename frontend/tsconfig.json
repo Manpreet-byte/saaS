@@ -28,6 +28,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@backend/*": [
+        "../backend/*"
       ]
     },
     "jsx": "react-jsx",
