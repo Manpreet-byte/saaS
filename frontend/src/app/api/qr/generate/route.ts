@@ -7,6 +7,10 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { business_id, google_review_link } = body;
 
+    if(!business_id || !google_review_link) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+
     const code = nanoid(8);
 
     const { data, error } = await supabase
@@ -26,7 +30,7 @@ export async function POST(req: Request) {
 
     const qrUrl = `http://localhost:3001/r/${code}`;
 
-    return NextResponse.json({
+  return NextResponse.json({
       success: true,
       qrUrl,
       code,
