@@ -1,72 +1,56 @@
 import { NextResponse } from "next/server";
 
-import { withJwtAuth } from "../../middleware/authMiddleware.js";
-import {
-  logEditedReviewResponse,
-  logGeneratedReviewResponse,
-} from "../../services/reviewService.js";
+import { createReview, listReviews } from "../../services/reviewService.js";
 
-const parseReviewBody = async (request) => request.json();
+export async function GET() {
+  try {
+    const reviews = await listReviews({ order: "desc" });
 
-const validateBody = (body) => body.reviewId && body.responseText;
-
-const getIpAddress = (request) =>
-  request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-
-export async function POST(request) {
-  const { user, response } = await withJwtAuth(request, ["manager", "admin"]);
-
-  if (response) {
-    return response;
-  }
-
-  const body = await parseReviewBody(request);
-
-  if (!validateBody(body)) {
+    return NextResponse.json({
+      success: true,
+      reviews,
+    });
+  } catch (error) {
     return NextResponse.json(
-      { error: "reviewId and responseText are required" },
-      { status: 400 },
+      { success: false, error: error.message || "Failed to fetch reviews" },
+      { status: 500 },
     );
   }
-
-  await logGeneratedReviewResponse({
-    userId: user.sub,
-    reviewId: body.reviewId,
-    ipAddress: getIpAddress(request),
-  });
-
-  return NextResponse.json({
-    success: true,
-    message: "Review response action recorded",
-    user,
-  });
 }
 
-export async function PATCH(request) {
-  const { user, response } = await withJwtAuth(request, ["manager", "admin"]);
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const rating = Number(body.rating);
+    const comment = String(body.comment ?? "").trim();
 
-  if (response) {
-    return response;
-  }
+    if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+      return NextResponse.json(
+        { success: false, error: "rating must be between 1 and 5" },
+        { status: 400 },
+      );
+    }
 
-  const body = await parseReviewBody(request);
+    if (!comment) {
+      return NextResponse.json(
+        { success: false, error: "comment is required" },
+        { status: 400 },
+      );
+    }
 
-  if (!validateBody(body)) {
+    const review = await createReview({ rating, comment });
+
     return NextResponse.json(
-      { error: "reviewId and responseText are required" },
-      { status: 400 },
+      {
+        success: true,
+        review,
+      },
+      { status: 201 },
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: error.message || "Failed to create review" },
+      { status: 500 },
     );
   }
-
-  await logEditedReviewResponse({
-    userId: user.sub,
-    reviewId: body.reviewId,
-    ipAddress: getIpAddress(request),
-  });
-
-  return NextResponse.json({
-    success: true,
-    message: "Review response edit recorded",
-    user,
-  });
 }
