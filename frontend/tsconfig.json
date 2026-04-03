@@ -30,7 +30,7 @@
         "./src/*"
       ]
     },
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "incremental": true,
     "plugins": [
       {

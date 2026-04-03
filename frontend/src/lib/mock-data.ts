@@ -1,10 +1,10 @@
 // Mock data for dashboard
 export const mockDashboardData = {
   kpis: [
-    { label: 'Total Reviews', value: '1,284', change: 12, trend: 'up' as const, icon: '⭐' },
-    { label: 'Positive Reviews', value: '1,089', change: 18, trend: 'up' as const, icon: '😊' },
-    { label: 'Negative Reviews', value: '195', change: -5, trend: 'down' as const, icon: '😞' },
-    { label: 'Response Rate', value: '87%', change: 8, trend: 'up' as const, icon: '📧' },
+    { label: 'Total Reviews', value: '1,284', change: 12, trend: 'up' as const, icon: '' },
+    { label: 'Positive Reviews', value: '1,089', change: 18, trend: 'up' as const, icon: '' },
+    { label: 'Negative Reviews', value: '195', change: -5, trend: 'down' as const, icon: '' },
+    { label: 'Response Rate', value: '87%', change: 8, trend: 'up' as const, icon: '' },
   ],
   trendData: [
     { name: 'Jan', reviews: 120, responses: 95 },
