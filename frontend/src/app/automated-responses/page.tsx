@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Header } from '@/components/layout/header';
+import { Sidebar } from '@/components/layout/sidebar';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableRow, TableHead, TableCell } from '@/components/ui/table';
@@ -92,8 +92,8 @@ export default function AutomatedResponsesPage() {
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <Sidebar />
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 lg:ml-64">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Header } from '@/components/layout/header';
+import { Sidebar } from '@/components/layout/sidebar';
 import { KPICard } from '@/components/dashboard/kpi-card';
 import { ReviewTrendChart, RatingDistributionChart, SentimentChart } from '@/components/dashboard/charts';
 import { ReviewList } from '@/components/dashboard/review-list';
@@ -12,8 +12,8 @@ export const metadata = {
 export default function DashboardPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+      <Sidebar />
+      <main className="min-h-screen px-4 py-6 lg:ml-64 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="card mb-8 overflow-hidden border-cyan-100 bg-gradient-to-r from-white/90 via-cyan-50/80 to-blue-100/70 dark:border-cyan-900/60 dark:from-slate-900/90 dark:via-slate-900/70 dark:to-cyan-950/30">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
