@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from '@/components/layout/header';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,12 +8,45 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { QrCode } from 'lucide-react';
 import { mockReviewFunnelData } from '@/lib/mock-data';
+
+const REVIEW_LINK = 'https://g.page/r/YourBusinessName/review';
 import { api } from "@/lib/axios";
 import { QRCodeCanvas } from "qrcode.react"; // 🔥 NEW
 import axios from 'axios';
 
 export default function ReviewFunnelPage() {
   const [showQRCode, setShowQRCode] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+
+  const handleCopyReviewLink = async () => {
+    try {
+      await navigator.clipboard.writeText(REVIEW_LINK);
+      setCopyFeedback('Link copied to clipboard.');
+      return;
+    } catch (_) {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = REVIEW_LINK;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        setCopyFeedback('Link copied to clipboard.');
+        return;
+      } catch (error) {
+        setCopyFeedback('Copy failed. Please select and copy manually.');
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!copyFeedback) return;
+    const timeout = window.setTimeout(() => setCopyFeedback(null), 3000);
+    return () => window.clearTimeout(timeout);
+  }, [copyFeedback]);
   const [qrData, setQrData] = useState<any>(null); // 🔥 NEW
   const [loading, setLoading] = useState(false); // 🔥 NEW
 
@@ -144,10 +177,14 @@ export default function ReviewFunnelPage() {
               <div className="flex gap-2">
                 <Input
                   type="text"
+                  value={REVIEW_LINK}
                   value={qrData?.qrUrl || "Generate QR first"}
                   readOnly
                   className="flex-1"
                 />
+                <Button variant="secondary" type="button" onClick={handleCopyReviewLink}>
+                  {copyFeedback ? 'Copied' : 'Copy'}
+                </Button>
                 <Button
                   onClick={() => {
                     if (qrData?.qrUrl) {
@@ -159,6 +196,11 @@ export default function ReviewFunnelPage() {
                   Copy
                 </Button>
               </div>
+              {copyFeedback && (
+                <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  {copyFeedback}
+                </p>
+              )}
             </CardBody>
           </Card>
 

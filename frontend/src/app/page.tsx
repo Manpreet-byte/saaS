@@ -42,6 +42,12 @@ export default function Home() {
           >
             Configure Workspace
           </Link>
+          <Link
+            href="/qr-landing"
+            className="inline-flex items-center gap-2 rounded-xl border border-cyan-200/80 bg-white/80 px-6 py-3 font-semibold text-cyan-700 shadow-sm transition hover:border-cyan-500 hover:text-cyan-600 dark:border-cyan-500/50 dark:bg-slate-900/80 dark:text-cyan-300"
+          >
+            Preview QR Landing
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
