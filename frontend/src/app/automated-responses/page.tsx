@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Header } from '@/components/layout/header';
+import { Sidebar } from '@/components/layout/sidebar';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableRow, TableHead, TableCell } from '@/components/ui/table';
@@ -9,17 +9,21 @@ import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
 import { Input } from '@/components/ui/input';
 import { mockAutomatedResponses } from '@/lib/mock-data';
-import { Send, Edit3, Clock, MessageSquare } from 'lucide-react';
+import { Send, Edit3, Clock, MessageSquare, Search } from 'lucide-react';
 
 export default function AutomatedResponsesPage() {
   const [responses, setResponses] = useState(mockAutomatedResponses);
   const [selectedResponse, setSelectedResponse] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingText, setEditingText] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   const handleApprove = (id: string) => {
     setResponses(
       responses.map((r) => (r.id === id ? { ...r, status: 'posted' } : r))
     );
+    setModalOpen(false);
   };
 
   const handleSchedule = (id: string) => {
@@ -28,6 +32,52 @@ export default function AutomatedResponsesPage() {
     );
     setModalOpen(false);
   };
+
+  const handleEdit = (response: any) => {
+    setSelectedResponse(response);
+    setEditingText(response.suggested);
+    setModalOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    if (!selectedResponse) return;
+
+    setResponses(
+      responses.map((response) =>
+        response.id === selectedResponse.id
+          ? { ...response, suggested: editingText, status: 'draft' }
+          : response
+      )
+    );
+    setModalOpen(false);
+  };
+
+  const handleRegenerate = () => {
+    if (!selectedResponse) return;
+
+    const reviewText = String(selectedResponse.review || '').toLowerCase();
+    const rating = Number(selectedResponse.rating || 0);
+
+    const regeneratedText =
+      rating <= 2
+        ? 'We are sorry for the inconvenience. Please contact us so we can review this and make it right.'
+        : reviewText.includes('great') || reviewText.includes('excellent')
+          ? 'Thank you so much for your kind words. We are glad our team could deliver a great experience for you.'
+          : 'Thank you for sharing your feedback. We appreciate it and will continue working to improve our service.';
+
+    setEditingText(regeneratedText);
+  };
+
+  const filteredResponses = responses.filter((response) => {
+    const matchesSearch =
+      response.reviewer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      response.review.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === 'all' || response.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   const getBadgeVariant = (status: string) => {
     switch (status) {
@@ -42,8 +92,8 @@ export default function AutomatedResponsesPage() {
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <Sidebar />
+      <main className="min-h-screen bg-slate-50 dark:bg-slate-950 lg:ml-64">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
@@ -54,6 +104,41 @@ export default function AutomatedResponsesPage() {
               Review AI suggestions and manage responses.
             </p>
           </div>
+
+          <Card className="mb-6">
+            <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Search reviews
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <Input
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search by reviewer or review text"
+                    className="pl-9"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Filter by status
+                </label>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="input-base w-full"
+                >
+                  <option value="all">All</option>
+                  <option value="draft">Draft</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="posted">Posted</option>
+                </select>
+              </div>
+            </CardBody>
+          </Card>
 
           {/* Responses Table */}
           <Card>
@@ -72,7 +157,7 @@ export default function AutomatedResponsesPage() {
                   </TableRow>
                 </TableHeader>
                 <tbody>
-                  {responses.map((response) => (
+                  {filteredResponses.map((response) => (
                     <TableRow key={response.id}>
                       <TableCell className="font-medium">{response.reviewer}</TableCell>
                       <TableCell className="max-w-xs">
@@ -110,10 +195,7 @@ export default function AutomatedResponsesPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => {
-                              setSelectedResponse(response);
-                              setModalOpen(true);
-                            }}
+                            onClick={() => handleEdit(response)}
                           >
                             <MessageSquare size={16} />
                           </Button>
@@ -153,7 +235,7 @@ export default function AutomatedResponsesPage() {
             onClose={() => setModalOpen(false)}
             title={`Response for ${selectedResponse?.reviewer}`}
             footer={
-              selectedResponse?.status === 'draft' && (
+              selectedResponse && (
                 <>
                   <Button
                     variant="secondary"
@@ -161,17 +243,28 @@ export default function AutomatedResponsesPage() {
                   >
                     Cancel
                   </Button>
-                  <Button onClick={() => handleApprove(selectedResponse.id)}>
-                    <Send size={16} className="mr-1" />
-                    Post Now
+                  <Button onClick={handleSaveEdit}>
+                    <Edit3 size={16} className="mr-1" />
+                    Save Edit
                   </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleSchedule(selectedResponse.id)}
-                  >
-                    <Clock size={16} className="mr-1" />
-                    Schedule
+                  <Button variant="ghost" onClick={handleRegenerate}>
+                    Regenerate
                   </Button>
+                  {selectedResponse.status === 'draft' && (
+                    <Button onClick={() => handleApprove(selectedResponse.id)}>
+                      <Send size={16} className="mr-1" />
+                      Post Now
+                    </Button>
+                  )}
+                  {selectedResponse.status !== 'posted' && (
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleSchedule(selectedResponse.id)}
+                    >
+                      <Clock size={16} className="mr-1" />
+                      Schedule
+                    </Button>
+                  )}
                 </>
               )
             }
@@ -205,9 +298,13 @@ export default function AutomatedResponsesPage() {
                   <h4 className="font-medium mb-2 text-slate-600 dark:text-slate-400">
                     AI-Suggested Response
                   </h4>
-                  <div className="p-3 bg-primary-50 dark:bg-primary-900/20 rounded border border-primary-200 dark:border-primary-800">
-                    <p className="text-sm">{selectedResponse.suggested}</p>
-                  </div>
+                  <textarea
+                    value={editingText}
+                    onChange={(e) => setEditingText(e.target.value)}
+                    rows={6}
+                    className="input-base w-full resize-none"
+                    placeholder="Edit the suggested response here..."
+                  />
                 </div>
 
                 {selectedResponse.status === 'scheduled' && (

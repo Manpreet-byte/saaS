@@ -24,10 +24,14 @@
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@backend/*": [
+        "../backend/*"
       ]
     },
     "jsx": "react-jsx",

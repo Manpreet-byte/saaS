@@ -1,11 +1,9 @@
-export const metadata = {
-  title: 'Automated Responses | Review Automation',
-};
+import { ProtectedRoute } from '@/components/auth/protected-route';
 
 export default function AutomatedResponsesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return <ProtectedRoute>{children}</ProtectedRoute>;
 }
