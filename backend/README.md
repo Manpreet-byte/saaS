@@ -16,9 +16,25 @@ npm install
 
 Environment variables
 - `PORT` - server port (default 4000)
-- `MONGODB_URI` - MongoDB connection string (if set, server will connect)
+- `SUPABASE_URL` - Supabase project URL (required)
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (required)
+- `MONGODB_URI` - MongoDB connection string (optional)
+- `REDIS_URL` - Redis connection string (optional). If provided the backend will use Bull/Redis for async job processing. Format: `redis://localhost:6379`
+- `AI_PROVIDER` - `auto`, `openai`, or `gemini` (optional, default `auto`)
 - `OPENAI_API_KEY` - OpenAI API key (optional)
- - `REDIS_URL` - Redis connection string (optional). If provided the backend will use Bull/Redis for async job processing. Format: `redis://localhost:6379`
+- `GEMINI_API_KEY` - Gemini API key (optional)
+- `JWT_SECRET` - JWT signing secret for shared auth helpers (required for auth routes)
+- `JWT_EXPIRES_IN_SECONDS` - JWT expiry in seconds (optional, default `86400`)
+- `GOOGLE_CLIENT_ID` - Google OAuth client id (required for Google login)
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret (required for Google login)
+- `GOOGLE_REDIRECT_URI` - OAuth callback URL (required for Google login)
+- `NEXT_PUBLIC_APP_URL` or `APP_URL` - app origin used by auth redirects (optional, defaults to `http://localhost:3000`)
+
+Quick setup
+
+```bash
+cp .env.example .env
+```
 
 Run
 

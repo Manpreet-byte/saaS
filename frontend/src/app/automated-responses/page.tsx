@@ -1,93 +1,83 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Card, CardBody, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
-import { Input } from '@/components/ui/input';
-import { mockAutomatedResponses } from '@/lib/mock-data';
-import { Send, Edit3, Clock, MessageSquare, Search } from 'lucide-react';
+import { listReviews, ReviewRecord } from '@/lib/api/reviews';
+import { MessageSquare, Loader2, RefreshCw, Eye } from 'lucide-react';
+
+type ResponseRow = ReviewRecord & {
+  reviewer: string;
+  suggested: string;
+};
+
+const getDefaultTone = (rating: number) => {
+  if (rating <= 2) return 'apologetic';
+  if (rating === 3) return 'professional';
+  return 'friendly';
+};
+
+const toInputDateTime = (isoDate?: string | null) => {
+  if (!isoDate) return '';
+
+  const date = new Date(isoDate);
+
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+  return local.toISOString().slice(0, 16);
+};
+
+const toResponseRow = (review: ReviewRecord): ResponseRow => ({
+  ...review,
+  reviewer: `Customer ${review.id.slice(0, 8)}`,
+  suggested: String(review.response_text ?? '').trim(),
+});
 
 export default function AutomatedResponsesPage() {
-  const [responses, setResponses] = useState(mockAutomatedResponses);
-  const [selectedResponse, setSelectedResponse] = useState<any>(null);
+  const [responses, setResponses] = useState<ResponseRow[]>([]);
+  const [selectedResponseId, setSelectedResponseId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editingText, setEditingText] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleApprove = (id: string) => {
-    setResponses(
-      responses.map((r) => (r.id === id ? { ...r, status: 'posted' } : r))
-    );
-    setModalOpen(false);
-  };
+  const selectedResponse = useMemo(
+    () => responses.find((response) => response.id === selectedResponseId) ?? null,
+    [responses, selectedResponseId],
+  );
 
-  const handleSchedule = (id: string) => {
-    setResponses(
-      responses.map((r) => (r.id === id ? { ...r, status: 'scheduled' } : r))
-    );
-    setModalOpen(false);
-  };
-
-  const handleEdit = (response: any) => {
-    setSelectedResponse(response);
-    setEditingText(response.suggested);
-    setModalOpen(true);
-  };
-
-  const handleSaveEdit = () => {
-    if (!selectedResponse) return;
-
-    setResponses(
-      responses.map((response) =>
-        response.id === selectedResponse.id
-          ? { ...response, suggested: editingText, status: 'draft' }
-          : response
-      )
-    );
-    setModalOpen(false);
-  };
-
-  const handleRegenerate = () => {
-    if (!selectedResponse) return;
-
-    const reviewText = String(selectedResponse.review || '').toLowerCase();
-    const rating = Number(selectedResponse.rating || 0);
-
-    const regeneratedText =
-      rating <= 2
-        ? 'We are sorry for the inconvenience. Please contact us so we can review this and make it right.'
-        : reviewText.includes('great') || reviewText.includes('excellent')
-          ? 'Thank you so much for your kind words. We are glad our team could deliver a great experience for you.'
-          : 'Thank you for sharing your feedback. We appreciate it and will continue working to improve our service.';
-
-    setEditingText(regeneratedText);
-  };
-
-  const filteredResponses = responses.filter((response) => {
-    const matchesSearch =
-      response.reviewer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      response.review.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === 'all' || response.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
-
-  const getBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'posted':
-        return 'success';
-      case 'scheduled':
-        return 'warning';
-      default:
-        return 'info';
+  const loadResponses = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const reviews = await listReviews();
+      setResponses(reviews.map(toResponseRow));
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'Unable to load review responses');
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    void loadResponses();
+  }, []);
+
+  const openModal = (response: ResponseRow) => {
+    setSelectedResponseId(response.id);
+    setModalOpen(true);
+    setError(null);
+  };
+
+  const applyUpdatedReview = (review: ReviewRecord) => {
+    const updated = toResponseRow(review);
+    setResponses((current) => current.map((item) => (item.id === review.id ? updated : item)));
+    setSelectedResponseId(updated.id);
   };
 
   return (
@@ -105,45 +95,22 @@ export default function AutomatedResponsesPage() {
             </p>
           </div>
 
-          <Card className="mb-6">
-            <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Search reviews
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                  <Input
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by reviewer or review text"
-                    className="pl-9"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Filter by status
-                </label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="input-base w-full"
-                >
-                  <option value="all">All</option>
-                  <option value="draft">Draft</option>
-                  <option value="scheduled">Scheduled</option>
-                  <option value="posted">Posted</option>
-                </select>
-              </div>
-            </CardBody>
-          </Card>
+          {error && (
+            <div className="mb-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-200">
+              {error}
+            </div>
+          )}
 
           {/* Responses Table */}
           <Card>
             <CardHeader>
-              <h2 className="text-xl font-semibold">Pending Responses</h2>
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-xl font-semibold">Past Reviews & Responses</h2>
+                <Button variant="secondary" size="sm" onClick={() => void loadResponses()} disabled={isLoading}>
+                  {isLoading ? <Loader2 size={16} className="mr-1 animate-spin" /> : <RefreshCw size={16} className="mr-1" />}
+                  Refresh
+                </Button>
+              </div>
             </CardHeader>
             <CardBody className="overflow-x-auto">
               <Table>
@@ -152,17 +119,30 @@ export default function AutomatedResponsesPage() {
                     <TableHead>Reviewer</TableHead>
                     <TableHead>Review</TableHead>
                     <TableHead>Rating</TableHead>
-                    <TableHead>Status</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <tbody>
-                  {filteredResponses.map((response) => (
+                  {isLoading && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center text-slate-500 dark:text-slate-400">
+                        Loading past reviews...
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {!isLoading && responses.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center text-slate-500 dark:text-slate-400">
+                        No reviews found.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {responses.map((response) => (
                     <TableRow key={response.id}>
                       <TableCell className="font-medium">{response.reviewer}</TableCell>
                       <TableCell className="max-w-xs">
                         <p className="text-sm text-slate-600 dark:text-slate-400 truncate">
-                          {response.review}
+                          {response.comment}
                         </p>
                       </TableCell>
                       <TableCell>
@@ -182,44 +162,15 @@ export default function AutomatedResponsesPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getBadgeVariant(response.status)}>
-                          {response.status === 'posted'
-                            ? '✓ Posted'
-                            : response.status === 'scheduled'
-                            ? '⏱ Scheduled'
-                            : '📝 Draft'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
                         <div className="flex gap-2">
                           <Button
-                            variant="ghost"
+                            variant="secondary"
                             size="sm"
-                            onClick={() => handleEdit(response)}
+                            onClick={() => openModal(response)}
                           >
-                            <MessageSquare size={16} />
+                            <Eye size={16} className="mr-1" />
+                            Review
                           </Button>
-                          {response.status === 'draft' && (
-                            <>
-                              <Button
-                                size="sm"
-                                onClick={() => handleApprove(response.id)}
-                              >
-                                <Send size={16} className="mr-1" />
-                                Send
-                              </Button>
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedResponse(response);
-                                  setModalOpen(true);
-                                }}
-                              >
-                                <Edit3 size={16} />
-                              </Button>
-                            </>
-                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -232,42 +183,11 @@ export default function AutomatedResponsesPage() {
           {/* Response Preview Modal */}
           <Modal
             isOpen={modalOpen}
-            onClose={() => setModalOpen(false)}
-            title={`Response for ${selectedResponse?.reviewer}`}
-            footer={
-              selectedResponse && (
-                <>
-                  <Button
-                    variant="secondary"
-                    onClick={() => setModalOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSaveEdit}>
-                    <Edit3 size={16} className="mr-1" />
-                    Save Edit
-                  </Button>
-                  <Button variant="ghost" onClick={handleRegenerate}>
-                    Regenerate
-                  </Button>
-                  {selectedResponse.status === 'draft' && (
-                    <Button onClick={() => handleApprove(selectedResponse.id)}>
-                      <Send size={16} className="mr-1" />
-                      Post Now
-                    </Button>
-                  )}
-                  {selectedResponse.status !== 'posted' && (
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSchedule(selectedResponse.id)}
-                    >
-                      <Clock size={16} className="mr-1" />
-                      Schedule
-                    </Button>
-                  )}
-                </>
-              )
-            }
+            onClose={() => {
+              setModalOpen(false);
+              setError(null);
+            }}
+            title={`Review for ${selectedResponse?.reviewer}`}
           >
             {selectedResponse && (
               <div className="space-y-4">
@@ -290,7 +210,7 @@ export default function AutomatedResponsesPage() {
                         </span>
                       ))}
                     </div>
-                    <p className="text-sm">{selectedResponse.review}</p>
+                    <p className="text-sm">{selectedResponse.comment}</p>
                   </div>
                 </div>
 
@@ -299,22 +219,13 @@ export default function AutomatedResponsesPage() {
                     AI-Suggested Response
                   </h4>
                   <textarea
-                    value={editingText}
-                    onChange={(e) => setEditingText(e.target.value)}
+                    value={selectedResponse.suggested || 'No AI response has been generated yet.'}
+                    readOnly
                     rows={6}
-                    className="input-base w-full resize-none"
-                    placeholder="Edit the suggested response here..."
+                    className="input-base w-full resize-none bg-slate-50 dark:bg-slate-800"
+                    placeholder="No AI response available yet."
                   />
                 </div>
-
-                {selectedResponse.status === 'scheduled' && (
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Schedule for
-                    </label>
-                    <Input type="datetime-local" />
-                  </div>
-                )}
               </div>
             )}
           </Modal>

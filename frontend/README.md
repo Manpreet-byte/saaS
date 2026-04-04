@@ -68,6 +68,29 @@ A modern, responsive Next.js + Tailwind CSS dashboard for managing Google review
 
 3. Open [http://localhost:3000](http://localhost:3000) in your browser
 
+### Environment Setup
+
+1. Create your local env file:
+
+  ```bash
+  cp .env.example .env.local
+  ```
+
+2. Fill required values in `.env.local`:
+
+  - `SUPABASE_URL`
+  - `SUPABASE_SERVICE_ROLE_KEY`
+  - `JWT_SECRET`
+  - `GOOGLE_CLIENT_ID`
+  - `GOOGLE_CLIENT_SECRET`
+  - `GOOGLE_REDIRECT_URI`
+
+3. Optional AI config for local response generation:
+
+  - `AI_PROVIDER=auto|openai|gemini`
+  - `OPENAI_API_KEY`
+  - `GEMINI_API_KEY`
+
 ## Project Structure
 
 ```

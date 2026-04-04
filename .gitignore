@@ -1,4 +1,5 @@
 /backend/.env
 /backend/node_modules/
 /backend/.env.local
+/backend/.data/
 /frontend/.env.local

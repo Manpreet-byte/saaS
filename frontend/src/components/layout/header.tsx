@@ -3,11 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Moon, Sun, Bell, LayoutDashboard, Sparkles, MessageSquare, Filter, SlidersHorizontal, LogOut } from 'lucide-react';
+import { Menu, X, Moon, Sun, Bell, LayoutDashboard, Sparkles, MessageSquare, Filter, SlidersHorizontal, LogOut, Inbox } from 'lucide-react';
 import { useAuth } from '@/components/providers/auth-provider';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Inbox', href: '/inbox', icon: Inbox },
   { name: 'Review Funnel', href: '/review-funnel', icon: Filter },
   { name: 'AI Suggestions', href: '/ai-suggestions', icon: Sparkles },
   { name: 'Responses', href: '/automated-responses', icon: MessageSquare },

@@ -1,1 +1,1 @@
-export { PATCH, POST } from "@backend/api/reviews/route.js";
+export { GET, POST } from "@backend/api/reviews/route.js";
