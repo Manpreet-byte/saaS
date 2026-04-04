@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Moon, Sun, Bell, LayoutDashboard, Sparkles, MessageSquare, Filter, SlidersHorizontal, LogOut } from 'lucide-react';
-import { useAuth } from '@/components/providers/auth-provider';
+import { Menu, X, Moon, Sun, Bell, LayoutDashboard, Sparkles, MessageSquare, Filter, SlidersHorizontal } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -18,7 +17,6 @@ export function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const pathname = usePathname();
-  const { user, logout, isAuthenticated } = useAuth();
 
   React.useEffect(() => {
     setDarkMode(document.documentElement.classList.contains('dark'));
@@ -33,14 +31,15 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-white/40 bg-white/70 backdrop-blur-xl dark:border-primary-700/70 dark:bg-primary-900/70">
+      <header className="sticky top-0 z-40 border-b border-white/40 bg-white/70 backdrop-blur-xl dark:border-slate-700/70 dark:bg-slate-900/70">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg shadow-primary-500/20">
+          <Link href="/dashboard" className="flex items-center gap-3">
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20">
               <LayoutDashboard size={18} />
             </div>
             <div>
-              <p className="display-font text-lg font-bold leading-none">ReviewMaster</p>
+              <p className="display-font text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Vedo Systems</p>
+              <p className="display-font text-lg font-bold leading-none">Review OS</p>
             </div>
           </Link>
 
@@ -85,20 +84,10 @@ export function Header() {
               {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
 
-            {isAuthenticated ? (
-              <button
-                onClick={logout}
-                className="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-rose-300 hover:text-rose-600 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:text-rose-400 sm:flex"
-              >
-                <LogOut size={16} />
-                Logout
-              </button>
-            ) : (
-              <button className="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-300 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 sm:flex">
-                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600" />
-                Blue Bottle Cafe
-              </button>
-            )}
+            <button className="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-300 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 sm:flex">
+              <div className="h-7 w-7 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600" />
+              Blue Bottle Cafe
+            </button>
           </div>
         </div>
 
