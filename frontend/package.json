@@ -14,16 +14,11 @@
     "axios": "^1.14.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-<<<<<<< HEAD
     "lucide-react": "^0.344.0",
     "nanoid": "^5.1.7",
     "next": "^16.0.0",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
-=======
-    "lucide-react": "^0.469.0",
-    "next": "^15.1.4",
->>>>>>> master
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.12.0",
