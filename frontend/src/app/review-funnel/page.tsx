@@ -8,66 +8,44 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { QrCode } from 'lucide-react';
 import { mockReviewFunnelData } from '@/lib/mock-data';
+import { QRCodeCanvas } from 'qrcode.react';
+import { api } from '@/lib/axios';
 
 const REVIEW_LINK = 'https://g.page/r/YourBusinessName/review';
-import { api } from "@/lib/axios";
-import { QRCodeCanvas } from "qrcode.react"; // 🔥 NEW
-import axios from 'axios';
 
 export default function ReviewFunnelPage() {
   const [showQRCode, setShowQRCode] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+  const [qrData, setQrData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
 
   const handleCopyReviewLink = async () => {
     try {
-      await navigator.clipboard.writeText(REVIEW_LINK);
+      const text = qrData?.qrUrl || REVIEW_LINK;
+      await navigator.clipboard.writeText(text);
       setCopyFeedback('Link copied to clipboard.');
-      return;
-    } catch (_) {
-      try {
-        const textarea = document.createElement('textarea');
-        textarea.value = REVIEW_LINK;
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-9999px';
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        setCopyFeedback('Link copied to clipboard.');
-        return;
-      } catch (error) {
-        setCopyFeedback('Copy failed. Please select and copy manually.');
-      }
+    } catch {
+      setCopyFeedback('Copy failed. Please copy manually.');
     }
   };
 
+
   useEffect(() => {
     if (!copyFeedback) return;
-    const timeout = window.setTimeout(() => setCopyFeedback(null), 3000);
-    return () => window.clearTimeout(timeout);
+    const timeout = setTimeout(() => setCopyFeedback(null), 3000);
+    return () => clearTimeout(timeout);
   }, [copyFeedback]);
-  const [qrData, setQrData] = useState<any>(null); // 🔥 NEW
-  const [loading, setLoading] = useState(false); // 🔥 NEW
 
-  // 🔥 QR Generate Function
-  const handleGenerateQR = async () => {
+  const generateQRCode = async () => {
     try {
       setLoading(true);
 
-      const res = await axios.post("/api/qr/generate", {
-        business_id: "550e8400-e29b-41d4-a716-446655440000",
-        google_review_link: "https://g.page/r/yourlink/review",
-      });
+      setQrData({ qrUrl: REVIEW_LINK });
 
-      if (res.data.success) {
-        setQrData(res.data);
-        setShowQRCode(true);
-      }
-
-    } catch (err: any) {
-      console.log(err.response?.data || err.message);
-      alert("QR generate failed");
+      setShowQRCode(true);
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -77,19 +55,15 @@ export default function ReviewFunnelPage() {
     <>
       <Header />
       <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          
-          {/* Header */}
+        <div className="max-w-4xl mx-auto px-4 py-8">
+
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-              Review Funnel
-            </h1>
-            <p className="text-slate-600 dark:text-slate-400">
+            <h1 className="text-3xl font-bold mb-2">Review Funnel</h1>
+            <p className="text-slate-600">
               Collect reviews through QR codes and direct links.
             </p>
           </div>
 
-          {/* QR Code Section */}
           <Card className="mb-8">
             <CardHeader>
               <h2 className="text-xl font-semibold">QR Code Scan Workflow</h2>
@@ -98,48 +72,20 @@ export default function ReviewFunnelPage() {
             <CardBody className="space-y-6">
               <div className="flex flex-col md:flex-row gap-8 items-center">
 
-                {/* 🔥 QR AREA */}
                 <div className="flex-1 flex justify-center">
-
-                  {showQRCode && qrData ? (
-                    <div className="text-center space-y-4">
-                      
-                      {/* ✅ REAL QR */}
-                      <QRCodeCanvas value={qrData.qrUrl} size={200} />
-
-                      <p className="text-sm text-slate-500">
-                        Scan to give review
-                      </p>
-
-                      {/* 🔗 URL */}
-                      <div className="flex gap-2">
-                        <Input value={qrData.qrUrl} readOnly />
-                        <Button
-                          onClick={() => {
-                            navigator.clipboard.writeText(qrData.qrUrl);
-                            alert("Copied!");
-                          }}
-                        >
-                          Copy
-                        </Button>
-                      </div>
-                    </div>
-
+                  {showQRCode ? (
+                    <QRCodeCanvas
+                      value={qrData?.qrUrl || REVIEW_LINK}
+                      size={200}
+                    />
                   ) : (
-                    <Button 
-                      onClick={handleGenerateQR} 
-                      variant="primary" 
-                      size="lg"
-                      disabled={loading}
-                    >
+                    <Button onClick={generateQRCode} size="lg">
                       <QrCode className="mr-2" />
-                      {loading ? "Generating..." : "Generate QR Code"}
+                      {loading ? 'Generating...' : 'Generate QR Code'}
                     </Button>
                   )}
-
                 </div>
 
-                {/* Instructions */}
                 <div className="flex-1 space-y-4">
                   <h3 className="font-semibold text-lg">How it works</h3>
                   <ol className="space-y-3 text-sm">
@@ -147,15 +93,11 @@ export default function ReviewFunnelPage() {
                       'Display QR code in your business location',
                       'Customer scans with their mobile device',
                       'Review form opens automatically',
-                      'Customer submits review based on rating',
+                      'Customer submits review directly to Google',
                     ].map((step, i) => (
                       <li key={i} className="flex gap-3">
-                        <span className="font-semibold text-primary-600">
-                          {i + 1}.
-                        </span>
-                        <span className="text-slate-600">
-                          {step}
-                        </span>
+                        <span className="font-semibold">{i + 1}.</span>
+                        <span>{step}</span>
                       </li>
                     ))}
                   </ol>
@@ -165,66 +107,53 @@ export default function ReviewFunnelPage() {
             </CardBody>
           </Card>
 
-          {/* Direct Link Section */}
           <Card className="mb-8">
             <CardHeader>
               <h2 className="text-xl font-semibold">Direct Review Link</h2>
             </CardHeader>
+
             <CardBody className="space-y-4">
-              <p className="text-sm text-slate-600">
-                Share this link anywhere to collect reviews.
-              </p>
               <div className="flex gap-2">
                 <Input
-                  type="text"
-                  value={REVIEW_LINK}
-                  value={qrData?.qrUrl || "Generate QR first"}
+                  value={qrData?.qrUrl || REVIEW_LINK}
                   readOnly
-                  className="flex-1"
                 />
-                <Button variant="secondary" type="button" onClick={handleCopyReviewLink}>
+                <Button onClick={handleCopyReviewLink}>
                   {copyFeedback ? 'Copied' : 'Copy'}
                 </Button>
-                <Button
-                  onClick={() => {
-                    if (qrData?.qrUrl) {
-                      navigator.clipboard.writeText(qrData.qrUrl);
-                      alert("Copied!");
-                    }
-                  }}
-                >
-                  Copy
-                </Button>
               </div>
+
               {copyFeedback && (
-                <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <p className="text-sm text-green-600">
                   {copyFeedback}
                 </p>
               )}
             </CardBody>
           </Card>
 
-          {/* Funnel Progress (unchanged) */}
           <Card>
             <CardHeader>
               <h2 className="text-xl font-semibold">Review Funnel Progress</h2>
             </CardHeader>
+
             <CardBody className="space-y-6">
               {mockReviewFunnelData.steps.map((step, i) => (
                 <div key={i}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">{step.name}</span>
-                    <Badge>{step.completed.toLocaleString()}</Badge>
+                  <div className="flex justify-between mb-2">
+                    <span>{step.name}</span>
+                    <Badge>{step.completed}</Badge>
                   </div>
-                  <div className="w-full bg-slate-200 rounded-full h-3">
+
+                  <div className="w-full bg-gray-200 h-3 rounded">
                     <div
-                      className="bg-blue-500 h-full"
+                      className="bg-blue-500 h-3 rounded"
                       style={{ width: `${step.percentage}%` }}
                     />
                   </div>
-                  <div className="text-xs mt-1">
-                    {step.percentage}% completion
-                  </div>
+
+                  <p className="text-xs mt-1">
+                    {step.percentage}% complete
+                  </p>
                 </div>
               ))}
             </CardBody>
