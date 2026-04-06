@@ -1,0 +1,10 @@
+QR SCAN SETUP GUIDE
+====================
+
+1. Print the signage template (qr-signage-template.svg) at A4 or 8x10. Laminate if the placard will live outdoors.
+2. Generate a QR code that points to https://your-domain.com/qr-landing and drop it inside the "Place QR code here" square.
+3. For multiple locations, append ?location=<slug> so the automation knows which store captured the visit.
+4. Place the placard at eye level near the checkout counter or waiting area.
+5. Test with both iOS and Android cameras to ensure the landing page opens within 1 second.
+6. Update the review threshold under Settings → Review Funnel if your escalation rules change.
+7. Share this document with franchise partners so they can reproduce signage without asking the CX team.

@@ -1,9 +1,11 @@
-import { ProtectedRoute } from '@/components/auth/protected-route';
+export const metadata = {
+  title: 'Settings | Review Automation',
+};
 
 export default function SettingsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <ProtectedRoute>{children}</ProtectedRoute>;
+  return children;
 }

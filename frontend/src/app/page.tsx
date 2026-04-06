@@ -1,22 +1,7 @@
-'use client';
-
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowRight, BarChart3, Bot, Settings, Sparkles, LogIn, UserPlus } from "lucide-react";
-import { useAuth } from "@/components/providers/auth-provider";
+import { ArrowRight, BarChart3, Bot, Settings, Sparkles } from "lucide-react";
 
 export default function Home() {
-  const { isAuthenticated } = useAuth();
-  const router = useRouter();
-
-  const handleDashboardClick = () => {
-    if (isAuthenticated) {
-      router.push('/dashboard');
-    } else {
-      router.push('/login');
-    }
-  };
-
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-14 sm:px-8">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_25%_20%,rgba(14,165,233,0.2),transparent_40%),radial-gradient(circle_at_75%_10%,rgba(250,204,21,0.17),transparent_32%)]" />
@@ -25,25 +10,9 @@ export default function Home() {
           <p className="display-font text-sm font-semibold uppercase tracking-[0.16em] text-cyan-700 dark:text-cyan-300">
             Google Review Automation v1.0
           </p>
-          <div className="flex items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300">
-              <Sparkles size={14} />
-              AI-first response workflow
-            </div>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white/85 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-500 hover:text-cyan-700 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:text-cyan-300"
-            >
-              <LogIn size={16} />
-              Login
-            </Link>
-            <Link
-              href="/signup"
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-cyan-500/25 transition hover:translate-y-[-1px] hover:shadow-xl"
-            >
-              <UserPlus size={16} />
-              Sign Up
-            </Link>
+          <div className="inline-flex items-center gap-2 rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300">
+            <Sparkles size={14} />
+            AI-first response workflow
           </div>
         </div>
 
@@ -60,18 +29,24 @@ export default function Home() {
         </div>
 
         <div className="mb-12 flex flex-wrap justify-center gap-4">
-          <button
-            onClick={handleDashboardClick}
+          <Link
+            href="/dashboard"
             className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-6 py-3 font-semibold text-white shadow-lg shadow-cyan-500/25 transition hover:translate-y-[-1px] hover:shadow-xl"
           >
             Open Dashboard
             <ArrowRight size={20} />
-          </button>
+          </Link>
           <Link
             href="/settings"
             className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white/85 px-6 py-3 font-semibold text-slate-800 transition hover:border-cyan-500 hover:text-cyan-700 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:hover:text-cyan-300"
           >
             Configure Workspace
+          </Link>
+          <Link
+            href="/qr-landing"
+            className="inline-flex items-center gap-2 rounded-xl border border-cyan-200/80 bg-white/80 px-6 py-3 font-semibold text-cyan-700 shadow-sm transition hover:border-cyan-500 hover:text-cyan-600 dark:border-cyan-500/50 dark:bg-slate-900/80 dark:text-cyan-300"
+          >
+            Preview QR Landing
           </Link>
         </div>
 
@@ -103,7 +78,6 @@ export default function Home() {
           ))}
         </div>
       </div>
-
     </main>
   );
 }

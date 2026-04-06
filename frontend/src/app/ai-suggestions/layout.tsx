@@ -1,9 +1,11 @@
-import { ProtectedRoute } from '@/components/auth/protected-route';
+export const metadata = {
+  title: 'AI Suggestions | Review Automation',
+};
 
 export default function AISuggestionsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <ProtectedRoute>{children}</ProtectedRoute>;
+  return children;
 }
