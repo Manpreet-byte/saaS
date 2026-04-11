@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, BarChart3, Bot, Settings, Sparkles } from "lucide-react";
+import { ArrowRight, BarChart3, Bot, Settings, Sparkles, QrCode } from "lucide-react";
+
 
 export default function Home() {
   return (
@@ -48,6 +49,29 @@ export default function Home() {
           >
             Preview QR Landing
           </Link>
+        </div>
+
+        <div className="mb-12 rounded-2xl border border-cyan-200/70 bg-white/90 p-5 shadow-[0_10px_28px_-18px_rgba(2,132,199,0.4)] dark:border-cyan-900/60 dark:bg-slate-900/70">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="inline-flex rounded-xl bg-cyan-100 p-2.5 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300">
+                <QrCode size={18} />
+              </div>
+              <div>
+                <p className="display-font text-lg font-semibold text-slate-900 dark:text-white">New: QR Scan Landing</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  Posters aur offline touchpoints ke liye dedicated scan flow ab live hai.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/qr-scan"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition hover:translate-y-[-1px] hover:shadow-xl"
+            >
+              Open QR Landing
+              <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
