@@ -1,9 +1,11 @@
 import React from 'react';
+import Link from 'next/link';
 import { Sidebar } from '@/components/layout/sidebar';
 import { KPICard } from '@/components/dashboard/kpi-card';
 import { ReviewTrendChart, RatingDistributionChart, SentimentChart } from '@/components/dashboard/charts';
 import { ReviewList } from '@/components/dashboard/review-list';
 import { mockDashboardData } from '@/lib/mock-data';
+import { ArrowRight, QrCode } from 'lucide-react';
 
 export const metadata = {
   title: 'Dashboard | Review Automation',
@@ -39,6 +41,27 @@ export default function DashboardPage() {
                 trend={kpi.trend}
               />
             ))}
+          </div>
+
+          <div className="card mb-8 border-cyan-100 bg-gradient-to-r from-cyan-50/80 via-white to-blue-50/70 dark:border-cyan-900/60 dark:from-slate-900/90 dark:via-slate-900/70 dark:to-cyan-950/30">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="inline-flex rounded-xl bg-cyan-100 p-2.5 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300">
+                  <QrCode size={18} />
+                </div>
+                <div>
+                  <h2 className="display-font text-lg font-semibold text-slate-900 dark:text-white">QR Scan Landing Live</h2>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">Create offline-to-online review journeys with a dedicated scan page.</p>
+                </div>
+              </div>
+              <Link
+                href="/qr-scan"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition hover:translate-y-[-1px] hover:shadow-xl"
+              >
+                Open QR Page
+                <ArrowRight size={16} />
+              </Link>
+            </div>
           </div>
 
           <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
