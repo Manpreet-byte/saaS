@@ -1,9 +1,11 @@
-import { ProtectedRoute } from '@/components/auth/protected-route';
+export const metadata = {
+  title: 'Review Funnel | Review Automation',
+};
 
 export default function ReviewFunnelLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <ProtectedRoute>{children}</ProtectedRoute>;
+  return children;
 }

@@ -1,0 +1,34 @@
+<svg width="1200" height="1600" viewBox="0 0 1200 1600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR signage template">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ecfeff" />
+      <stop offset="50%" stop-color="#dbeafe" />
+      <stop offset="100%" stop-color="#eef2ff" />
+    </linearGradient>
+    <linearGradient id="pill" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <style><![CDATA[
+      .title { font: 700 120px 'Space Grotesk', 'Manrope', sans-serif; fill: #0f172a; letter-spacing: -4px; }
+      .subtitle { font: 500 42px 'Manrope', sans-serif; fill: #334155; }
+      .body { font: 400 36px 'Manrope', sans-serif; fill: #475569; }
+      .cta { font: 700 46px 'Manrope', sans-serif; fill: #fff; letter-spacing: 6px; }
+    ]]></style>
+  </defs>
+  <rect width="1200" height="1600" fill="url(#bg)" rx="60" />
+  <rect x="120" y="160" width="960" height="1280" rx="40" fill="#fff" stroke="#e0f2fe" stroke-width="6" />
+  <text x="600" y="360" text-anchor="middle" class="title">SCAN &amp; RATE</text>
+  <text x="600" y="450" text-anchor="middle" class="subtitle">Let us know how we did today</text>
+  <rect x="350" y="520" width="500" height="500" rx="30" fill="#f1f5f9" stroke="#bae6fd" stroke-width="8" />
+  <text x="600" y="760" text-anchor="middle" class="body">Place QR code here</text>
+  <g transform="translate(180 1100)">
+    <text class="body">1. Point your camera or QR app</text>
+    <text class="body" y="70">2. Rate your experience in 3 taps</text>
+    <text class="body" y="140">3. Happy visits go to Google, others stay private</text>
+  </g>
+  <g transform="translate(220 1340)">
+    <rect width="760" height="120" rx="60" fill="url(#pill)" />
+    <text x="380" y="80" text-anchor="middle" class="cta">SHARE YOUR VISIT</text>
+  </g>
+</svg>
